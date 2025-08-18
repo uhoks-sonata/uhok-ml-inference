@@ -1,0 +1,13 @@
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+sentence-transformers==5.0.0
+torch==2.7.1
+torchvision==0.22.1
+numpy==2.3.2
+scikit-learn==1.7.1
+scipy==1.15.0
+pandas==2.3.1
+# faiss-cpu==1.8.0  # Python 3.13.5 호환성 문제로 제거
+pydantic==2.11.7
+python-multipart==0.0.20
+httpx==0.25.2
