@@ -1,13 +1,12 @@
-fastapi==0.116.1
-uvicorn[standard]==0.35.0
-sentence-transformers==5.0.0
-torch==2.7.1
-torchvision==0.22.1
-numpy==2.3.2
-scikit-learn==1.7.1
-scipy==1.15.0
-pandas==2.3.1
-# faiss-cpu==1.8.0  # Python 3.13.5 호환성 문제로 제거
-pydantic==2.11.7
-python-multipart==0.0.20
-httpx==0.25.2
+# ==================== [ML/AI/NLP/임베딩/딥러닝] ====================
+torch==2.7.1                   # PyTorch 공식 패키지명 (딥러닝 모델 동작 필수)
+torchvision==0.22.1            # PyTorch용 이미지 처리 확장 라이브러리
+sentence-transformers==5.0.0   # BERT, SBERT 등 문장 임베딩(문장 벡터화) 라이브러리
+huggingface_hub==0.34.3        # HuggingFace 허브에서 모델 다운로드/관리용 유틸리티
+transformers==4.54.1           # HuggingFace의 트랜스포머 기반 사전학습 모델 라이브러리
+scikit-learn==1.7.1            # 머신러닝/유사도계산 등 데이터 분석용 라이브러리 (cosine_similarity 등)
+scipy                          # 수치 해석 및 과학계산 지원 라이브러리 (scikit-learn 의존)
+
+# ==================== [데이터 분석/처리/시각화/실험] ====================
+pandas==2.3.1                  # 데이터프레임/분석 라이브러리
+numpy==2.3.2                   # 수치계산/배열 처리 핵심 라이브러리
