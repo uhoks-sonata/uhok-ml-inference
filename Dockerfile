@@ -16,32 +16,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential git curl \
   && rm -rf /var/lib/apt/lists/*
 
-# (선택) 추가 의존성이 있다면 requirements.txt 먼저 설치해 캐시 활용
-#   * 가장 좋은 방법은 아래 "중요"에 적은 대로 모든 버전을 requirements.txt에 명시하는 것
+# requirements.txt 복사 및 모든 의존성 설치
 COPY requirements.txt .
 
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --upgrade pip && \
-    pip install --no-cache-dir --prefix=/install -r requirements.txt || true
-
-# 명시 버전 패키지 설치 (필요 시 requirements.txt로 이전 권장)
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --no-cache-dir --prefix=/install \
-      fastapi==0.116.1 uvicorn[standard]==0.35.0 pydantic==2.11.7 \
-      httpx==0.28.1 python-multipart==0.0.20
-
-# Torch CPU 전용 휠
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --no-cache-dir --prefix=/install \
-      torch==2.7.1 torchvision==0.22.1 \
-      --index-url https://download.pytorch.org/whl/cpu
-
-# ML 스택
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --no-cache-dir --prefix=/install \
-      sentence-transformers==5.0.0 huggingface_hub==0.34.3 \
-      transformers==4.54.1 scikit-learn==1.7.1 \
-      scipy numpy==2.3.2 pandas==2.3.1
+    pip install --no-cache-dir --upgrade pip \
+ && pip install --no-cache-dir --prefix=/install -r requirements.txt
 
 
 #############################

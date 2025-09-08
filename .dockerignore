@@ -1,0 +1,36 @@
+# === ML large artifacts (must ignore for Docker) ===
+# 모델/캐시/체크포인트
+hf_cache/
+models/
+checkpoints/
+weights/
+artifacts/
+outputs/
+mlruns/
+wandb/
+lightning_logs/
+
+# HuggingFace/Transformers/Torch 캐시 (혹시 리포 내부에 생긴 경우)
+.cache/
+**/.cache/
+**/huggingface/
+**/transformers/
+**/torch_cache/
+
+# 데이터(리포 내부 보관 시)
+data/
+datasets/
+raw/
+processed/
+
+# 대형 바이너리 가중치/모델 파일
+*.pt
+*.bin
+*.safetensors
+*.onnx
+*.ckpt
+*.pth
+*.pkl
+
+# 노트북/실험 산출
+*.ipynb

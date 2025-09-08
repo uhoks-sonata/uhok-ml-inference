@@ -1,21 +1,22 @@
+# PyTorch CPU 전용 휠 사용
+--extra-index-url https://download.pytorch.org/whl/cpu
+
 # ==================== [FastAPI/웹서버] ====================
-fastapi==0.116.1               # FastAPI 웹 프레임워크 (백엔드와 동일 버전)
-uvicorn[standard]==0.35.0      # ASGI 서버 (백엔드와 동일 버전)
-pydantic==2.11.7               # 데이터 검증 및 설정 관리 (백엔드와 동일 버전)
-httpx==0.28.1                  # 비동기 HTTP 클라이언트 (백엔드와 동일 버전)
+fastapi==0.116.1               # FastAPI 웹 프레임워크
+uvicorn[standard]==0.35.0      # ASGI 서버
+pydantic==2.11.7               # 데이터 검증 및 설정 관리
+httpx==0.28.1                  # 비동기 HTTP 클라이언트
+python-multipart==0.0.20       # FastAPI 파일 업로드 지원
 
 # ==================== [ML/AI/NLP/임베딩/딥러닝] ====================
-torch==2.7.1                   # PyTorch (백엔드와 동일 버전)
-torchvision==0.22.1            # PyTorch용 이미지 처리 확장 라이브러리 (백엔드와 동일 버전)
-sentence-transformers==5.0.0   # BERT, SBERT 등 문장 임베딩 라이브러리 (백엔드와 동일 버전)
-huggingface_hub==0.34.3        # HuggingFace 허브에서 모델 다운로드/관리용 (백엔드와 동일 버전)
-transformers==4.54.1           # HuggingFace 트랜스포머 모델 라이브러리 (백엔드와 동일 버전)
-scikit-learn==1.7.1            # 머신러닝/유사도계산 라이브러리 (백엔드와 동일 버전)
-scipy                          # 수치 해석 및 과학계산 지원 (백엔드와 동일 버전)
+torch==2.7.1                   # PyTorch (CPU 전용)
+# torchvision==0.22.1            # PyTorch용 이미지 처리 확장 라이브러리
+sentence-transformers==5.0.0   # BERT, SBERT 등 문장 임베딩 라이브러리 (핵심)
+huggingface_hub==0.34.3        # HuggingFace 허브에서 모델 다운로드/관리용
+transformers==4.54.1           # HuggingFace 트랜스포머 모델 라이브러리
+# scikit-learn==1.7.1            # 머신러닝/유사도계산 라이브러리
+# scipy                          # 수치 해석 및 과학계산 지원
 
-# ==================== [데이터 처리] ====================
-numpy==2.3.2                   # 수치계산/배열 처리 핵심 라이브러리 (백엔드와 동일 버전)
-pandas==2.3.1                  # 데이터프레임/분석 라이브러리 (백엔드와 동일 버전)
-
-# ==================== [유틸리티] ====================
-python-multipart==0.0.20       # FastAPI 파일 업로드 지원 (백엔드와 동일 버전)
+# # ==================== [데이터 처리] ====================
+numpy==2.3.2                   # 수치계산/배열 처리 핵심 라이브러리
+# pandas==2.3.1                  # 데이터프레임/분석 라이브러리
