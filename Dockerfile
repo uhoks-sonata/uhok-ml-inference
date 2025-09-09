@@ -53,9 +53,15 @@ COPY --from=builder /install /usr/local
 # 애플리케이션 소스
 COPY . .
 
-# 비루트 유저 (권한 문제로 임시 비활성화)
-# RUN useradd -m appuser && chown -R appuser:appuser /app /models || true
-# USER appuser
+# 1단계: 비루트 유저 생성
+RUN useradd -m -u 1000 appuser
+
+# 2단계: 필요한 디렉토리 생성 및 권한 설정
+RUN mkdir -p /app /models/hf_cache && \
+    chown -R appuser:appuser /app /models
+
+# 3단계: 비루트 유저로 전환
+USER appuser
 
 # HF 캐시를 볼륨으로 분리(콜드스타트/네트워크 절약)
 VOLUME ["/models/hf_cache"]
