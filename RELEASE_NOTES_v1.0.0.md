@@ -1,6 +1,6 @@
-# Release Notes
+# Uhok ML-Inference v1.0.0 Release Notes
 
-## [1.0.0] - 2024-01-15
+## [v1.0.0] - 2025-09-09
 
 ### 🎉 첫 번째 정식 릴리스
 
@@ -215,9 +215,8 @@ docker stats uhok-ml-inference
 
 ### 🏆 기여자
 
-- **개발팀**: UHOK 개발팀
-- **ML팀**: 머신러닝 모델 최적화
-- **DevOps팀**: 인프라 및 배포 자동화
+- **개발팀**: @khangte @seosebin 
+- **ML팀**: @ziheon-42 
 
 ---
 
