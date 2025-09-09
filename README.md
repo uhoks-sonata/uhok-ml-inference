@@ -17,82 +17,9 @@
 [pgvector]                   [paraphrase-multilingual-MiniLM-L12-v2]
 ```
 
-## 🚀 API 엔드포인트
+## 🚀 빠른 시작
 
-### 헬스 체크
-```http
-GET /health
-```
-
-**응답:**
-```json
-{
-  "status": "ok",
-  "model": "paraphrase-multilingual-MiniLM-L12-v2",
-  "dim": 384,
-  "version": "sentence-transformers-5.0.0"
-}
-```
-
-### 단일 텍스트 임베딩
-```http
-POST /api/v1/embed
-Content-Type: application/json
-
-{
-  "text": "갈비탕",
-  "normalize": true
-}
-```
-
-**응답:**
-```json
-{
-  "embedding": [0.123, -0.456, 0.789, ...],
-  "dim": 384,
-  "version": "sentence-transformers-5.0.0"
-}
-```
-
-### 배치 텍스트 임베딩
-```http
-POST /api/v1/embed-batch
-Content-Type: application/json
-
-{
-  "texts": ["갈비탕", "김치찌개", "된장찌개"],
-  "normalize": true
-}
-```
-
-**응답:**
-```json
-{
-  "embeddings": [[0.123, -0.456, ...], [0.234, -0.567, ...], [0.345, -0.678, ...]],
-  "dim": 384,
-  "version": "sentence-transformers-5.0.0",
-  "count": 3
-}
-```
-
-### 모델 정보 조회
-```http
-GET /api/v1/model-info
-```
-
-**응답:**
-```json
-{
-  "model_name": "paraphrase-multilingual-MiniLM-L12-v2",
-  "dimension": 384,
-  "version": "sentence-transformers-5.0.0",
-  "device": "cpu"
-}
-```
-
-## 🐳 Docker 실행
-
-### 로컬 개발
+### Docker로 실행
 ```bash
 # 이미지 빌드
 docker build -t uhok-ml-inference .
@@ -101,17 +28,51 @@ docker build -t uhok-ml-inference .
 docker run -p 8001:8001 uhok-ml-inference
 ```
 
-### Docker Compose
-```yaml
-services:
-  ml-inference:
-    build: ./uhok-ml-inference
-    ports:
-      - "8001:8001"
-    environment:
-      - HF_HOME=/models/hf_cache
-    volumes:
-      - ml_cache:/models/hf_cache
+### Docker Compose로 실행
+```bash
+cd uhok-deploy
+docker-compose --profile with-ml up -d
+```
+
+## 📡 API 사용법
+
+### 헬스 체크
+```bash
+curl http://localhost:8001/health
+```
+
+### 단일 텍스트 임베딩
+```bash
+curl -X POST http://localhost:8001/api/v1/embed \
+  -H "Content-Type: application/json" \
+  -d '{"text": "갈비탕", "normalize": true}'
+```
+
+### 배치 텍스트 임베딩
+```bash
+curl -X POST http://localhost:8001/api/v1/embed-batch \
+  -H "Content-Type: application/json" \
+  -d '{"texts": ["갈비탕", "김치찌개", "된장찌개"], "normalize": true}'
+```
+
+## 🔧 개발 환경 설정
+
+### 로컬 개발
+```bash
+# 의존성 설치
+pip install -r requirements.txt
+
+# 개발 서버 실행
+python -m app.main
+```
+
+### 환경 변수
+```bash
+# HuggingFace 모델 캐시 디렉토리
+export HF_HOME=/models/hf_cache
+
+# Python 경로 설정
+export PYTHONPATH=/app
 ```
 
 ## 📊 성능 특성
@@ -120,17 +81,6 @@ services:
 - **처리량**: CPU 기반, 단일 워커
 - **지연시간**: 첫 요청 시 모델 로딩 시간 포함
 - **메모리**: 약 1-2GB (모델 + 런타임)
-
-## 🔧 설정
-
-### 환경 변수
-- `HF_HOME`: HuggingFace 모델 캐시 디렉토리
-- `PYTHONPATH`: Python 경로 설정
-
-### 로깅
-- 구조화된 JSON 로그 출력
-- 요청/응답 시간 측정
-- 에러 상세 정보 포함
 
 ## 🧪 테스트
 
@@ -158,12 +108,6 @@ curl http://localhost:8001/api/v1/model-info
 # uhok-deploy 디렉토리에서 실행
 python test_ml_integration.py
 ```
-
-## 📈 모니터링
-
-- **헬스체크**: `/health` 엔드포인트
-- **메트릭**: 요청 수, 응답 시간, 에러율
-- **로그**: 구조화된 JSON 형태
 
 ## 🔄 백엔드 연동
 
@@ -207,16 +151,7 @@ except Exception as e:
     return None
 ```
 
-## 🚨 주의사항
-
-1. **첫 요청 지연**: 모델 로딩으로 인한 콜드스타트 (약 10-30초)
-2. **메모리 사용량**: 모델 크기로 인한 높은 메모리 사용 (1-2GB)
-3. **네트워크 의존성**: 백엔드와 ML 서비스 간 네트워크 연결 필요
-4. **에러 처리**: ML 서비스 장애 시 폴백 메커니즘 필요
-5. **타임아웃 설정**: 모델 로딩 시간을 고려한 충분한 타임아웃 설정 필요
-6. **동시성**: 단일 모델 인스턴스로 인한 처리량 제한
-
-## 🔧 개발 및 디버깅
+## 📈 모니터링
 
 ### 로그 확인
 ```bash
@@ -227,6 +162,26 @@ docker compose logs -f ml-inference
 python -m app.main
 ```
 
+### 성능 모니터링
+```bash
+# 메모리 사용량 확인
+docker stats uhok-ml-inference
+
+# CPU 사용량 확인
+docker exec uhok-ml-inference top
+```
+
+## 🚨 주의사항
+
+1. **첫 요청 지연**: 모델 로딩으로 인한 콜드스타트 (약 10-30초)
+2. **메모리 사용량**: 모델 크기로 인한 높은 메모리 사용 (1-2GB)
+3. **네트워크 의존성**: 백엔드와 ML 서비스 간 네트워크 연결 필요
+4. **에러 처리**: ML 서비스 장애 시 폴백 메커니즘 필요
+5. **타임아웃 설정**: 모델 로딩 시간을 고려한 충분한 타임아웃 설정 필요
+6. **동시성**: 단일 모델 인스턴스로 인한 처리량 제한
+
+## 🔧 문제 해결
+
 ### 모델 캐시 관리
 ```bash
 # HuggingFace 캐시 디렉토리 확인
@@ -236,11 +191,50 @@ ls -la ~/.cache/huggingface/
 rm -rf ~/.cache/huggingface/
 ```
 
-### 성능 모니터링
+### 네트워크 연결 확인
 ```bash
-# 메모리 사용량 확인
-docker stats uhok-ml-inference
+# 백엔드에서 ML 서비스 연결 테스트
+docker-compose exec backend ping ml-inference
 
-# CPU 사용량 확인
-docker exec uhok-ml-inference top
+# 포트 확인
+docker-compose exec backend telnet ml-inference 8001
 ```
+
+### 메모리 부족 해결
+```bash
+# 컨테이너 메모리 제한 설정
+docker run -m 4g -p 8001:8001 uhok-ml-inference
+
+# 또는 docker-compose.yml에서
+services:
+  ml-inference:
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+```
+
+## 📚 API 문서
+
+자세한 API 문서는 서비스 실행 후 다음 URL에서 확인할 수 있습니다:
+- **Swagger UI**: http://localhost:8001/docs
+- **ReDoc**: http://localhost:8001/redoc
+
+## 🤝 기여하기
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 라이선스
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
+
+## 📞 지원
+
+문제가 발생하거나 질문이 있으시면:
+1. 이슈를 생성해주세요
+2. 로그를 확인해주세요: `docker-compose logs -f ml-inference`
+3. 헬스체크를 확인해주세요: `curl http://localhost:8001/health`
