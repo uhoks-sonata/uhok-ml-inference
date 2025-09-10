@@ -64,12 +64,14 @@ RUN mkdir -p /app /models/hf_cache && \
 USER appuser
 
 # HF 캐시를 볼륨으로 분리(콜드스타트/네트워크 절약)
+# 네임드 볼륨 선언(compose가 따로 지정하지 않았을 때만 쓰임). 
+# 지금은 compose가 명시해 두었으니 compose 설정이 우선
 VOLUME ["/models/hf_cache"]
 
 EXPOSE 8001
 
 # 헬스체크 (/health 엔드포인트 가정)
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=180s --retries=3 \
   CMD curl -f http://localhost:8001/health || exit 1
 
 # 실행
