@@ -1,0 +1,42 @@
+services:
+  ml-inference:
+    build:
+      context: ../uhok-ml-inference
+      dockerfile: Dockerfile
+    image: uhok-ml-inference:1.0.1
+    user: "1000:1000"  # 실행 사용자 명시 (appuser) (PermissionError 방지)
+    environment:
+      - HF_HOME=/models/hf_cache
+      - TRANSFORMERS_CACHE=/models/hf_cache
+      - SENTENCE_TRANSFORMERS_HOME=/models/hf_cache
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ml_cache:/models/hf_cache   # 네임드 볼륨 -> 컨테이너 경로 매핑
+      # - /data/models:/models:ro   # 모델 가중치는 이미지에 넣지 말고 볼륨/마운트 권장
+    ports:
+      - "8001:8001"   # localhost:8001로 접근 가능
+    expose:
+      - "8001"   # 내부 통신도 유지
+    healthcheck:
+      # 실제 엔드포인트에 맞춰 /health 또는 /healthz 로 변경
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8001/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 180s
+      retries: 3
+    # networks: [app_net]
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+volumes:
+  ml_cache:
+
+# networks:
+#   app_net:
+#     external: true
+#     name: uhok-deploy_app_net
+    
