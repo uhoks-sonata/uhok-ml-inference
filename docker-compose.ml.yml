@@ -24,7 +24,10 @@ services:
       timeout: 10s
       start_period: 180s
       retries: 3
-    # networks: [app_net]
+    # 🔧 네트워크 설정 (환경별 주석 처리)
+    # EC2: 주석 처리 (독립 실행)
+    # 로컬: 주석 해제 (다른 서비스와 통신)
+    networks: [app_net]
     restart: unless-stopped
     logging:
       driver: json-file
@@ -35,8 +38,11 @@ services:
 volumes:
   ml_cache:
 
-# networks:
-#   app_net:
-#     external: true
-#     name: uhok-deploy_app_net
+# 🔧 네트워크 정의 (환경별 주석 처리)
+# EC2: 전체 주석 처리
+# 로컬: 주석 해제하여 app_net 네트워크 생성
+networks:
+  app_net:
+    external: true
+    name: uhok-deploy_app_net
     
