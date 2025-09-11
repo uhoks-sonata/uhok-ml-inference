@@ -29,6 +29,14 @@ docker run -p 8001:8001 uhok-ml-inference
 ```
 
 ### Docker Compose로 실행
+
+#### 로컬 개발 환경
+```bash
+cd uhok-ml-inference
+docker-compose -f docker-compose.ml.yml up -d
+```
+
+#### 통합 환경 (uhok-deploy와 함께)
 ```bash
 cd uhok-deploy
 docker-compose --profile with-ml up -d
@@ -58,12 +66,30 @@ curl -X POST http://localhost:8001/api/v1/embed-batch \
 ## 🔧 개발 환경 설정
 
 ### 로컬 개발
+
+#### Python 직접 실행
 ```bash
 # 의존성 설치
 pip install -r requirements.txt
 
 # 개발 서버 실행
 python -m app.main
+```
+
+#### Docker Compose 사용 (권장)
+```bash
+# ML 서비스만 독립 실행
+cd uhok-ml-inference
+docker-compose -f docker-compose.ml.yml up --build
+
+# 백그라운드 실행
+docker-compose -f docker-compose.ml.yml up -d
+
+# 로그 확인
+docker-compose -f docker-compose.ml.yml logs -f
+
+# 서비스 중지
+docker-compose -f docker-compose.ml.yml down
 ```
 
 ### 환경 변수
@@ -155,8 +181,11 @@ except Exception as e:
 
 ### 로그 확인
 ```bash
-# Docker Compose로 실행 중인 경우
-docker compose logs -f ml-inference
+# Docker Compose로 실행 중인 경우 (독립 실행)
+docker-compose -f docker-compose.ml.yml logs -f
+
+# 통합 환경에서 실행 중인 경우
+docker-compose logs -f ml-inference
 
 # 직접 실행 중인 경우
 python -m app.main
@@ -193,7 +222,10 @@ rm -rf ~/.cache/huggingface/
 
 ### 네트워크 연결 확인
 ```bash
-# 백엔드에서 ML 서비스 연결 테스트
+# 독립 실행 환경에서 연결 테스트
+curl http://localhost:8001/health
+
+# 통합 환경에서 백엔드에서 ML 서비스 연결 테스트
 docker-compose exec backend ping ml-inference
 
 # 포트 확인
@@ -205,13 +237,36 @@ docker-compose exec backend telnet ml-inference 8001
 # 컨테이너 메모리 제한 설정
 docker run -m 4g -p 8001:8001 uhok-ml-inference
 
-# 또는 docker-compose.yml에서
+# 또는 docker-compose.ml.yml에서
 services:
   ml-inference:
     deploy:
       resources:
         limits:
           memory: 4G
+```
+
+## 🔄 버전 관리
+
+### 버전 업그레이드
+```bash
+# 1. docker-compose.ml.yml에서 이미지 버전 수정
+# image: uhok-ml-inference:1.0.1 → uhok-ml-inference:1.0.2
+
+# 2. 새 이미지 빌드
+docker-compose -f docker-compose.ml.yml build --no-cache
+
+# 3. 서비스 재시작
+docker-compose -f docker-compose.ml.yml down
+docker-compose -f docker-compose.ml.yml up -d
+```
+
+### 롤백
+```bash
+# 이전 버전으로 롤백
+# docker-compose.ml.yml에서 이전 버전으로 수정 후
+docker-compose -f docker-compose.ml.yml down
+docker-compose -f docker-compose.ml.yml up -d
 ```
 
 ## 📚 API 문서
