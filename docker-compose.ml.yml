@@ -1,7 +1,7 @@
 services:
   ml-inference:
     build:
-      context: ../uhok-ml-inference
+      context: .
       dockerfile: Dockerfile
     image: uhok-ml-inference:1.0.1
     user: "1000:1000"  # 실행 사용자 명시 (appuser) (PermissionError 방지)
