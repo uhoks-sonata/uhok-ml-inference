@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: uhok-ml-inference:1.0.1
+    image: uhok-ml-inference:1.1.0
     user: "1000:1000"  # 실행 사용자 명시 (appuser) (PermissionError 방지)
     environment:
       - HF_HOME=/models/hf_cache
