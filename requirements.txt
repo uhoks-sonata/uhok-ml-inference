@@ -20,3 +20,8 @@ transformers==4.54.1           # HuggingFace 트랜스포머 모델 라이브러
 # # ==================== [데이터 처리] ====================
 numpy==2.3.2                   # 수치계산/배열 처리 핵심 라이브러리
 # pandas==2.3.1                  # 데이터프레임/분석 라이브러리
+
+# ==================== [DB/ORM] ====================
+sqlalchemy==2.0.42             # ORM 및 데이터베이스 연결/쿼리용 라이브러리
+psycopg[binary]==3.2.9         # PostgreSQL용 비동기 SQLAlchemy 드라이버
+pgvector==0.3.6                # PostgreSQL 벡터 확장 및 SQLAlchemy 지원

@@ -1,17 +1,45 @@
 """
-ML 모델 의존성 관리
-모델 로딩, 캐싱, 정보 제공을 담당합니다.
+ML 모델 및 DB 의존성 관리
+모델 로딩, 캐싱, 정보 제공 및 DB 세션 관리를 담당합니다.
 """
 
 import asyncio
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, AsyncGenerator
 import time
-from sentence_transformers import SentenceTransformer
+import os
 import logging
+
+from sentence_transformers import SentenceTransformer
+from pydantic_settings import BaseSettings
+from pydantic import Field
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 
 logger = logging.getLogger(__name__)
 
-# 전역 모델 캐시
+# --- Settings ---
+class Settings(BaseSettings):
+    postgres_recommend_url: str = Field(..., env="POSTGRES_RECOMMEND_URL")
+
+    class Config:
+        env_file = os.path.join(os.path.dirname(__file__), "..", ".env")
+        env_file_encoding = "utf-8"
+        extra = "ignore"
+
+settings = Settings()
+
+# --- Database Connection ---
+engine = create_async_engine(settings.postgres_recommend_url, pool_pre_ping=True)
+AsyncSessionLocal = sessionmaker(
+    autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
+)
+
+async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
+    """DB 세션 의존성 주입"""
+    async with AsyncSessionLocal() as session:
+        yield session
+
+# --- Model Cache ---
 _model: Optional[SentenceTransformer] = None
 _model_lock = asyncio.Lock()
 _model_info: Optional[Dict[str, Any]] = None
@@ -28,7 +56,6 @@ async def get_model() -> SentenceTransformer:
         logger.debug("캐시된 SentenceTransformer 모델 사용 중")
         return _model
     
-    # 모델 로딩 시간 체크 시작
     start_time = time.time()
     
     async with _model_lock:
@@ -37,7 +64,6 @@ async def get_model() -> SentenceTransformer:
             try:
                 _model = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2", device="cpu")
                 
-                # 모델 정보 저장
                 _model_info = {
                     "model_name": "paraphrase-multilingual-MiniLM-L12-v2",
                     "dimension": 384,
@@ -45,7 +71,6 @@ async def get_model() -> SentenceTransformer:
                     "device": "cpu"
                 }
                 
-                # 모델 로딩 시간 체크 완료 및 로깅
                 loading_time = time.time() - start_time
                 logger.info(f"SentenceTransformer 모델 로드 완료: 로딩시간={loading_time:.3f}초")
             except Exception as e:
@@ -62,7 +87,6 @@ async def get_model_info() -> Dict[str, Any]:
     global _model_info
     
     if _model_info is None:
-        # 모델이 로드되지 않았다면 로드
         await get_model()
     
     return _model_info
@@ -70,13 +94,6 @@ async def get_model_info() -> Dict[str, Any]:
 async def encode_text(text: str, normalize: bool = True) -> list:
     """
     텍스트를 임베딩으로 변환합니다.
-    
-    Args:
-        text: 임베딩할 텍스트
-        normalize: 정규화 여부
-        
-    Returns:
-        임베딩 벡터 (list of float)
     """
     model = await get_model()
     embedding = model.encode(text, normalize_embeddings=normalize)
