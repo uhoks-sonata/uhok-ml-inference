@@ -5,6 +5,7 @@
 fastapi==0.116.1               # FastAPI 웹 프레임워크
 uvicorn[standard]==0.35.0      # ASGI 서버
 pydantic==2.11.7               # 데이터 검증 및 설정 관리
+pydantic-settings==2.10.1
 httpx==0.28.1                  # 비동기 HTTP 클라이언트
 python-multipart==0.0.20       # FastAPI 파일 업로드 지원
 
