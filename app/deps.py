@@ -10,7 +10,7 @@ import os
 import logging
 
 from sentence_transformers import SentenceTransformer
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -19,12 +19,13 @@ logger = logging.getLogger(__name__)
 
 # --- Settings ---
 class Settings(BaseSettings):
-    postgres_recommend_url: str = Field(..., env="POSTGRES_RECOMMEND_URL")
+    model_config = SettingsConfigDict(
+        env_file=os.path.join(os.path.dirname(__file__), "..", ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
-    class Config:
-        env_file = os.path.join(os.path.dirname(__file__), "..", ".env")
-        env_file_encoding = "utf-8"
-        extra = "ignore"
+    postgres_recommend_url: str = Field(..., env="POSTGRES_RECOMMEND_URL")
 
 settings = Settings()
 
@@ -83,12 +84,8 @@ async def get_model() -> SentenceTransformer:
     return _model
 
 async def get_model_info() -> Dict[str, Any]:
-    """모델 정보를 반환합니다."""
-    global _model_info
-    
     if _model_info is None:
         await get_model()
-    
     return _model_info
 
 async def encode_text(text: str, normalize: bool = True) -> list:

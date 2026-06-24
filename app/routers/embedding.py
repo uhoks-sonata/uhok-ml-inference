@@ -4,7 +4,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 
 from ..models.embedding import EmbedRequest, EmbedResponse, EmbedBatchRequest, EmbedBatchResponse
-from ..deps import encode_text, get_model_info
+from ..deps import encode_text, get_model, get_model_info
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -40,7 +40,8 @@ async def create_embeddings_batch(request: EmbedBatchRequest):
     start_time = time.time()
     try:
         logger.info(f"배치 임베딩 생성 요청: count={len(request.texts)}, normalize={request.normalize}")
-        embeddings = [await encode_text(text, request.normalize) for text in request.texts]
+        model = await get_model()
+        embeddings = model.encode(request.texts, normalize_embeddings=request.normalize).tolist()
         model_info = await get_model_info()
         response = EmbedBatchResponse(
             embeddings=embeddings,
